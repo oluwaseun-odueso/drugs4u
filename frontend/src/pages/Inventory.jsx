@@ -46,10 +46,6 @@ function AddBatchModal({ onClose, onSaved }) {
                 </select>
               </div>
               <div className="form-group">
-                <label>Batch Number <span className="req">*</span></label>
-                <input type="text" required value={form.batch_number} onChange={e => set('batch_number', e.target.value)} />
-              </div>
-              <div className="form-group">
                 <label>Quantity <span className="req">*</span></label>
                 <input type="number" required min={0} value={form.quantity} onChange={e => set('quantity', e.target.value)} />
               </div>
