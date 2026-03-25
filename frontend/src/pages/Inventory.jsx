@@ -3,7 +3,7 @@ import { inventory as api, medicines as medApi } from '../lib/api';
 
 function AddBatchModal({ onClose, onSaved }) {
   const [medicines, setMedicines] = useState([]);
-  const [form, setForm]   = useState({ medication_id: '', batch_number: '', quantity: '', expiry_date: '', low_stock_threshold: 10 });
+  const [form, setForm]   = useState({ medication_id: '', quantity: '', expiry_date: '', low_stock_threshold: 10 });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
