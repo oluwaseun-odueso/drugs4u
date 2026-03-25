@@ -122,7 +122,7 @@ export default function Inventory() {
                       <span className={`badge ${+item.is_low_stock ? 'badge-danger' : 'badge-success'}`}>
                         {item.quantity}
                       </span>
-                      {+item.is_low_stock && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--accent)' }}>Low</span>}
+                      {+item.is_low_stock > 0 && <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--accent)' }}>Low</span>}
                     </td>
                     <td>{item.expiry_date}</td>
                     <td>{item.received_date}</td>
