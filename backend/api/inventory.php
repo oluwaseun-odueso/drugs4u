@@ -47,7 +47,7 @@ if ($method === 'GET') {
 // ── POST ─────────────────────────────────────────────────────────────────────
 if ($method === 'POST') {
     $b = getBody();
-    foreach (['medication_id', 'batch_number', 'quantity', 'expiry_date'] as $f) {
+    foreach (['medication_id', 'quantity', 'expiry_date'] as $f) {
         if (!isset($b[$f]) || $b[$f] === '') respondError("Field '$f' is required");
     }
 
@@ -56,10 +56,7 @@ if ($method === 'POST') {
     $expiry = DateTime::createFromFormat('Y-m-d', $b['expiry_date']);
     if (!$expiry) respondError('Invalid expiry_date format (YYYY-MM-DD)');
 
-    // Check for duplicate batch
-    $dup = $pdo->prepare("SELECT inventory_id FROM inventory WHERE medication_id = ? AND batch_number = ?");
-    $dup->execute([(int)$b['medication_id'], $b['batch_number']]);
-    if ($dup->fetch()) respondError('Batch number already exists for this medication');
+    $batch_number = 'BN-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
 
     $stmt = $pdo->prepare("
         INSERT INTO inventory (medication_id, batch_number, quantity, expiry_date, low_stock_threshold, received_date)
@@ -67,7 +64,7 @@ if ($method === 'POST') {
     ");
     $stmt->execute([
         (int)$b['medication_id'],
-        $b['batch_number'],
+        $batch_number,
         (int)$b['quantity'],
         $b['expiry_date'],
         (int)($b['low_stock_threshold'] ?? 10),
