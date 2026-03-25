@@ -1,0 +1,16 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Route all /api/* requests to the appropriate file
+RewriteRule ^api/auth/login$   api/auth/login.php  [L]
+RewriteRule ^api/auth/logout$  api/auth/logout.php [L]
+RewriteRule ^api/auth/me$      api/auth/me.php     [L]
+
+RewriteRule ^api/customers$    api/customers.php   [QSA,L]
+RewriteRule ^api/medicines$    api/medicines.php   [QSA,L]
+RewriteRule ^api/inventory$    api/inventory.php   [QSA,L]
+RewriteRule ^api/prescriptions$ api/prescriptions.php [QSA,L]
+RewriteRule ^api/alerts$       api/alerts.php      [QSA,L]
+RewriteRule ^api/reports$      api/reports.php     [QSA,L]
+RewriteRule ^api/dashboard$    api/dashboard.php   [QSA,L]
