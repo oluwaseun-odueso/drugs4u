@@ -5,6 +5,7 @@ require_once __DIR__ . '/../middleware/auth.php';
 require_once __DIR__ . '/../helpers/response.php';
 
 $user   = requireAuth();
+requireRole('admin');
 $pdo    = getDBConnection();
 $type   = $_GET['type']      ?? 'by_date';
 $from   = $_GET['date_from'] ?? date('Y-m-01');

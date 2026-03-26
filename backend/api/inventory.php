@@ -46,6 +46,7 @@ if ($method === 'GET') {
 
 // ── POST ─────────────────────────────────────────────────────────────────────
 if ($method === 'POST') {
+    requireRole('admin');
     $b = getBody();
     foreach (['medication_id', 'quantity', 'expiry_date'] as $f) {
         if (!isset($b[$f]) || $b[$f] === '') respondError("Field '$f' is required");
