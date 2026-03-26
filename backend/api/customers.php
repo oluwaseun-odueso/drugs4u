@@ -92,8 +92,8 @@ if ($method === 'POST') {
     $stmt = $pdo->prepare("
         INSERT INTO customers
             (title, first_name, last_name, date_of_birth, address_line1, address_line2,
-             city, postcode, phone, email, nhs_number, allergies, medical_conditions, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             city, postcode, phone, email, nhs_number, allergies, drug_allergies, medical_conditions, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $nil($b['title']              ?? null),
@@ -108,6 +108,7 @@ if ($method === 'POST') {
         $nil($b['email']              ?? null),
         $nil($b['nhs_number']         ?? null),
         $nil($b['allergies']          ?? null),
+        $nil($b['drug_allergies']     ?? null),
         $nil($b['medical_conditions'] ?? null),
         $user['id'],
     ]);
@@ -131,7 +132,7 @@ if ($method === 'PUT') {
             title = ?, first_name = ?, last_name = ?, date_of_birth = ?,
             address_line1 = ?, address_line2 = ?, city = ?, postcode = ?,
             phone = ?, email = ?, nhs_number = ?,
-            allergies = ?, medical_conditions = ?,
+            allergies = ?, drug_allergies = ?, medical_conditions = ?,
             updated_at = NOW()
         WHERE customer_id = ?
     ")->execute([
@@ -147,6 +148,7 @@ if ($method === 'PUT') {
         $nil($b['email']              ?? null),
         $nil($b['nhs_number']         ?? null),
         $nil($b['allergies']          ?? null),
+        $nil($b['drug_allergies']     ?? null),
         $nil($b['medical_conditions'] ?? null),
         $id,
     ]);

@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS customers (
     email              VARCHAR(100) NULL,
     nhs_number         VARCHAR(20)  NULL UNIQUE,
     allergies          TEXT NULL,
+    drug_allergies     TEXT NULL,
     medical_conditions TEXT NULL,
     is_active          TINYINT(1) NOT NULL DEFAULT 1,
     created_by         INT NULL,
