@@ -141,9 +141,11 @@ CREATE TABLE IF NOT EXISTS alerts_log (
     FOREIGN KEY (acknowledged_by) REFERENCES users(user_id)                 ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
--- ─── Seed: default admin (password: Admin@1234) ──────────────────────────────
+-- ─── Seed: default users (password: admin123) ────────────────────────────────
 INSERT IGNORE INTO users (username, password_hash, full_name, email, role)
 VALUES ('admin', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator', 'admin@drugs4u.local', 'admin');
+INSERT IGNORE INTO users (username, password_hash, full_name, email, role)
+VALUES ('pharmacist', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Staff Pharmacist', 'pharmacist@drugs4u.local', 'pharmacist');
 
 -- ─── Seed: sample medications ────────────────────────────────────────────────
 INSERT IGNORE INTO medications (medication_id, medication_name, generic_name, strength, form, manufacturer, requires_prescription, age_restricted, min_age_years, controlled_drug, requires_id_check, low_stock_threshold)
