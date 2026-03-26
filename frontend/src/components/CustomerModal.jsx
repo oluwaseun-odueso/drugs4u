@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { customers as api } from '../lib/api';
 
 const ALLERGEN_OPTIONS = [
@@ -53,9 +53,19 @@ function buildValue(checked, options, otherText) {
 
 function MultiSelectField({ label, options, value, onChange }) {
   const parsed = parseValue(value, options);
-  const [checked, setChecked] = useState(parsed.checked);
+  const [checked, setChecked]         = useState(parsed.checked);
   const [otherChecked, setOtherChecked] = useState(parsed.otherText !== '');
-  const [otherText, setOtherText]       = useState(parsed.otherText);
+  const [otherText, setOtherText]     = useState(parsed.otherText);
+  const [open, setOpen]               = useState(false);
+  const wrapperRef                    = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const toggle = (opt) => {
     const next = new Set(checked);
@@ -75,33 +85,59 @@ function MultiSelectField({ label, options, value, onChange }) {
     onChange(buildValue(checked, options, e.target.value));
   };
 
+  const selectedItems = options.filter(o => checked.has(o));
+  const allSelected   = [...selectedItems, ...(otherText.trim() ? [otherText.trim()] : [])];
+  const summary = allSelected.length === 0
+    ? 'None selected'
+    : allSelected.slice(0, 2).join(', ') + (allSelected.length > 2 ? `, +${allSelected.length - 2} more` : '');
+
   return (
-    <div className="form-group full">
+    <div className="form-group full" ref={wrapperRef} style={{ position: 'relative' }}>
       <label>{label}</label>
-      <div style={{
-        border: '1px solid var(--border)', borderRadius: 'var(--radius)',
-        maxHeight: 160, overflowY: 'auto', padding: '6px 10px',
-        background: '#fff', display: 'flex', flexDirection: 'column', gap: 4,
-      }}>
-        {options.map(opt => (
-          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0 }}>
-            <input type="checkbox" checked={checked.has(opt)} onChange={() => toggle(opt)} style={{ margin: 0 }} />
-            {opt}
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', textAlign: 'left', padding: '8px 12px',
+          border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+          background: '#fff', cursor: 'pointer', fontSize: 13,
+          color: allSelected.length === 0 ? 'var(--text-muted)' : 'inherit',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}
+      >
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{summary}</span>
+        <span style={{ marginLeft: 8, fontSize: 10 }}>{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+          border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+          background: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          maxHeight: 200, overflowY: 'auto', padding: '6px 10px',
+          display: 'flex', flexDirection: 'column', gap: 4,
+        }}>
+          {options.map(opt => (
+            <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0 }}>
+              <input type="checkbox" checked={checked.has(opt)} onChange={() => toggle(opt)} style={{ margin: 0 }} />
+              {opt}
+            </label>
+          ))}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0, borderTop: '1px solid var(--border)', paddingTop: 4, marginTop: 2 }}>
+            <input type="checkbox" checked={otherChecked} onChange={toggleOther} style={{ margin: 0 }} />
+            Other
           </label>
-        ))}
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0, borderTop: '1px solid var(--border)', paddingTop: 4, marginTop: 2 }}>
-          <input type="checkbox" checked={otherChecked} onChange={toggleOther} style={{ margin: 0 }} />
-          Other
-        </label>
-      </div>
-      {otherChecked && (
-        <input
-          type="text"
-          value={otherText}
-          onChange={changeOther}
-          placeholder="Describe other..."
-          style={{ marginTop: 6 }}
-        />
+          {otherChecked && (
+            <input
+              type="text"
+              value={otherText}
+              onChange={changeOther}
+              placeholder="Describe other..."
+              style={{ marginTop: 4 }}
+              onClick={e => e.stopPropagation()}
+            />
+          )}
+        </div>
       )}
     </div>
   );
