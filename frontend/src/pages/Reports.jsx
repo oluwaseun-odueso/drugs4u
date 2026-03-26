@@ -16,9 +16,8 @@ const GREEN  = '#22c55e';
 const inputStyle = { padding: '7px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: 13 };
 const selectStyle = { ...inputStyle, fontWeight: 600 };
 
-const DATE_RANGE_TYPES = ['by_date', 'prescriptions', 'by_customer', 'by_stock'];
+const DATE_RANGE_TYPES  = ['by_date', 'prescriptions', 'by_customer', 'by_stock'];
 const SINGLE_DATE_TYPES = ['customers'];
-const NO_DATE_TYPES     = ['inventory', 'medicines'];
 
 function FlagBadges({ row }) {
   return (
@@ -131,19 +130,24 @@ export default function Reports() {
         <div className="card" style={{ marginBottom: 16 }}>
           <div className="card-body">
             <h3 style={{ marginBottom: 16, fontSize: 14, fontWeight: 600 }}>Current Stock Levels</h3>
-            <ResponsiveContainer width="100%" height={Math.max(200, data.length * 38)}>
-              <BarChart data={data} layout="vertical" margin={{ top: 4, right: 40, left: 120, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="medication_name" tick={{ fontSize: 11 }} width={115} />
-                <Tooltip />
-                <Bar dataKey="current_stock" name="Stock">
-                  {data.map((r, i) => (
-                    <Cell key={i} fill={+r.is_low_stock ? DANGER : GREEN} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {(() => {
+              const stockChartData = data.map(r => ({ ...r, current_stock: Number(r.current_stock) }));
+              return (
+                <ResponsiveContainer width="100%" height={Math.max(200, data.length * 38)}>
+                  <BarChart data={stockChartData} layout="vertical" margin={{ top: 4, right: 40, left: 120, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                    <XAxis type="number" tick={{ fontSize: 11 }} />
+                    <YAxis type="category" dataKey="medication_name" tick={{ fontSize: 11 }} width={115} />
+                    <Tooltip />
+                    <Bar dataKey="current_stock" name="Stock">
+                      {stockChartData.map((r, i) => (
+                        <Cell key={i} fill={+r.is_low_stock ? DANGER : GREEN} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              );
+            })()}
             <div style={{ display: 'flex', gap: 16, marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
               <span><span style={{ color: GREEN }}>■</span> Adequate</span>
               <span><span style={{ color: DANGER }}>■</span> Low stock</span>
