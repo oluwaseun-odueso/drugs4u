@@ -51,7 +51,7 @@ export default function Layout() {
         </div>
 
         <nav className="sidebar-nav">
-          {NAV.map(({ to, label, icon, exact }) => (
+          {visibleNav.map(({ to, label, icon, exact }) => (
             <NavLink
               key={to}
               to={to}
