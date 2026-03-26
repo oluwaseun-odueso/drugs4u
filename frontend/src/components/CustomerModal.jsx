@@ -1,11 +1,111 @@
 import { useState } from 'react';
 import { customers as api } from '../lib/api';
 
+const ALLERGEN_OPTIONS = [
+  'Celery', 'Cereals containing gluten', 'Crustaceans', 'Eggs', 'Fish',
+  'Lupin', 'Milk', 'Molluscs', 'Mustard', 'Peanuts', 'Sesame', 'Soybeans',
+  'Sulphur dioxide / Sulphites', 'Tree nuts',
+  'Pollen', 'Dust mites', 'Animal dander', 'Insect stings (bee / wasp)', 'Latex',
+];
+
+const DRUG_ALLERGY_OPTIONS = [
+  'Penicillin / Amoxicillin', 'Sulfonamides (Sulfa drugs)', 'Aspirin',
+  'Ibuprofen / NSAIDs', 'Naproxen', 'Anticonvulsants', 'Chemotherapy drugs',
+  'Contrast dyes', 'Local anaesthetics', 'General anaesthetics', 'ACE Inhibitors', 'Insulin',
+];
+
+const CONDITION_OPTIONS = [
+  'Asthma', 'Hypertension (high blood pressure)', 'Coronary heart disease',
+  'Stroke', 'Arrhythmia', 'Diabetes (Type 1)', 'Diabetes (Type 2)',
+  'Thyroid disorder', 'Obesity', 'Arthritis', 'Osteoporosis', 'Back pain',
+  'Depression', 'Anxiety', 'Bipolar disorder', 'Dementia',
+  'GORD / Acid reflux', 'IBS', 'Eczema', 'Dermatitis',
+  'Headaches / Migraines', 'Common cold / Influenza', 'Pneumonia',
+];
+
 const EMPTY = {
   title: '', first_name: '', last_name: '', date_of_birth: '',
   address_line1: '', address_line2: '', city: '', postcode: '',
-  phone: '', email: '', nhs_number: '', allergies: '', medical_conditions: '',
+  phone: '', email: '', nhs_number: '',
+  allergies: '', drug_allergies: '', medical_conditions: '',
 };
+
+// Parses a comma-separated string into { checked: Set, otherText: string }
+function parseValue(value, options) {
+  if (!value) return { checked: new Set(), otherText: '' };
+  const tokens = value.split(', ').map(t => t.trim()).filter(Boolean);
+  const optionSet = new Set(options);
+  const checked = new Set();
+  const others = [];
+  for (const t of tokens) {
+    if (optionSet.has(t)) checked.add(t);
+    else others.push(t);
+  }
+  return { checked, otherText: others.join(', ') };
+}
+
+// Serialises back to comma-separated string
+function buildValue(checked, options, otherText) {
+  const ordered = options.filter(o => checked.has(o));
+  if (otherText.trim()) ordered.push(otherText.trim());
+  return ordered.join(', ');
+}
+
+function MultiSelectField({ label, options, value, onChange }) {
+  const parsed = parseValue(value, options);
+  const [checked, setChecked] = useState(parsed.checked);
+  const [otherChecked, setOtherChecked] = useState(parsed.otherText !== '');
+  const [otherText, setOtherText]       = useState(parsed.otherText);
+
+  const toggle = (opt) => {
+    const next = new Set(checked);
+    if (next.has(opt)) next.delete(opt); else next.add(opt);
+    setChecked(next);
+    onChange(buildValue(next, options, otherChecked ? otherText : ''));
+  };
+
+  const toggleOther = (e) => {
+    const on = e.target.checked;
+    setOtherChecked(on);
+    onChange(buildValue(checked, options, on ? otherText : ''));
+  };
+
+  const changeOther = (e) => {
+    setOtherText(e.target.value);
+    onChange(buildValue(checked, options, e.target.value));
+  };
+
+  return (
+    <div className="form-group full">
+      <label>{label}</label>
+      <div style={{
+        border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+        maxHeight: 160, overflowY: 'auto', padding: '6px 10px',
+        background: '#fff', display: 'flex', flexDirection: 'column', gap: 4,
+      }}>
+        {options.map(opt => (
+          <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0 }}>
+            <input type="checkbox" checked={checked.has(opt)} onChange={() => toggle(opt)} style={{ margin: 0 }} />
+            {opt}
+          </label>
+        ))}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 400, cursor: 'pointer', margin: 0, borderTop: '1px solid var(--border)', paddingTop: 4, marginTop: 2 }}>
+          <input type="checkbox" checked={otherChecked} onChange={toggleOther} style={{ margin: 0 }} />
+          Other
+        </label>
+      </div>
+      {otherChecked && (
+        <input
+          type="text"
+          value={otherText}
+          onChange={changeOther}
+          placeholder="Describe other..."
+          style={{ marginTop: 6 }}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function CustomerModal({ initial, onClose, onSaved }) {
   const isEdit = !!initial;
@@ -92,14 +192,25 @@ export default function CustomerModal({ initial, onClose, onSaved }) {
                 <label>City <span className="req">*</span></label>
                 <input type="text" required value={form.city} onChange={e => set('city', e.target.value)} />
               </div>
-              <div className="form-group full">
-                <label>Known Allergies</label>
-                <textarea value={form.allergies} onChange={e => set('allergies', e.target.value)} placeholder="List any known allergies..." />
-              </div>
-              <div className="form-group full">
-                <label>Medical Conditions</label>
-                <textarea value={form.medical_conditions} onChange={e => set('medical_conditions', e.target.value)} placeholder="List any relevant medical conditions..." />
-              </div>
+
+              <MultiSelectField
+                label="Known Allergies"
+                options={ALLERGEN_OPTIONS}
+                value={form.allergies}
+                onChange={v => set('allergies', v)}
+              />
+              <MultiSelectField
+                label="Drug Allergies"
+                options={DRUG_ALLERGY_OPTIONS}
+                value={form.drug_allergies}
+                onChange={v => set('drug_allergies', v)}
+              />
+              <MultiSelectField
+                label="Medical Conditions"
+                options={CONDITION_OPTIONS}
+                value={form.medical_conditions}
+                onChange={v => set('medical_conditions', v)}
+              />
             </div>
           </div>
           <div className="modal-footer">
