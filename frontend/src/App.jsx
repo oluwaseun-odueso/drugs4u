@@ -21,6 +21,13 @@ function RequireAuth({ children }) {
   return children;
 }
 
+function RequireAdmin({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
+  if (user?.role !== 'admin') return <Navigate to="/app" replace />;
+  return children;
+}
+
 export default function App() {
   const { user, loading } = useAuth();
 
@@ -35,11 +42,11 @@ export default function App() {
         <Route path="customers"           element={<Customers />} />
         <Route path="customers/:id"       element={<CustomerDetail />} />
         <Route path="medicines"           element={<Medicines />} />
-        <Route path="inventory"           element={<Inventory />} />
+        <Route path="inventory"           element={<RequireAdmin><Inventory /></RequireAdmin>} />
         <Route path="prescriptions"       element={<Prescriptions />} />
         <Route path="prescriptions/new"   element={<NewPrescription />} />
         <Route path="prescriptions/:id"   element={<PrescriptionDetail />} />
-        <Route path="reports"             element={<Reports />} />
+        <Route path="reports"             element={<RequireAdmin><Reports /></RequireAdmin>} />
         <Route path="alerts"              element={<Alerts />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

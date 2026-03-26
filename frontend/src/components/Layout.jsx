@@ -16,6 +16,8 @@ const NAV = [
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate          = useNavigate();
+  const isAdmin           = user?.role === 'admin';
+  const visibleNav        = NAV.filter(item => isAdmin || (item.label !== 'Reports' && item.label !== 'Inventory'));
   const [alertCount, setAlertCount] = useState(0);
 
   useEffect(() => {
