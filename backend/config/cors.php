@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/env.php';
 $allowed = defined('FRONTEND_URL') ? FRONTEND_URL : 'http://localhost:5173';
 
 header('Access-Control-Allow-Origin: ' . $allowed);
