@@ -11,14 +11,14 @@ services:
   # ── PHP Backend ──────────────────────────────────────────────────────────────
   - type: web
     name: pharma4-backend
-    env: docker
+    runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: free
+    plan: starter
     envVars:
       # Set these in the Render dashboard after provisioning your MySQL DB
       - key: DB_HOST
-        sync: false          # fill in manually
+        sync: false
       - key: DB_NAME
         sync: false
       - key: DB_USER
@@ -36,17 +36,12 @@ services:
   # ── React Frontend ────────────────────────────────────────────────────────────
   - type: web
     name: pharma4-frontend
-    env: static
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    plan: free
+    # Set publish directory to "dist" in the Render dashboard
     envVars:
-      # Set this to your pharma4-backend Render URL, e.g. https://pharma4-backend.onrender.com
+      # Set this to your pharma4-backend Render URL
+      # e.g. https://pharma4-backend.onrender.com
       - key: VITE_API_URL
         sync: false
-    routes:
-      # SPA fallback — send all non-asset requests to index.html
-      - type: rewrite
-        source: /*
-        destination: /index.html
