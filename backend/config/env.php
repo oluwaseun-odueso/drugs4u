@@ -14,7 +14,7 @@ if (file_exists($envFile)) {
 }
 
 // Fall back to real environment variables (production / Docker / Render)
-foreach (['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG', 'FRONTEND_URL'] as $key) {
+foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL', 'APP_ENV', 'APP_DEBUG', 'FRONTEND_URL'] as $key) {
     if (!defined($key)) {
         $val = getenv($key);
         if ($val !== false) define($key, $val);
