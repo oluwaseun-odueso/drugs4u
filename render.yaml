@@ -39,7 +39,7 @@ services:
     runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    # Set publish directory to "dist" in the Render dashboard
+    staticPublishPath: ./dist
     envVars:
       # Set this to your pharma4-backend Render URL
       # e.g. https://pharma4-backend.onrender.com
