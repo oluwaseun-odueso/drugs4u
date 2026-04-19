@@ -1,5 +1,11 @@
 <?php
 require_once __DIR__ . '/env.php';
+
+// Allow session cookies to be sent cross-origin (required for production)
+ini_set('session.cookie_samesite', 'None');
+ini_set('session.cookie_secure', '1');
+ini_set('session.cookie_httponly', '1');
+
 $allowed = defined('FRONTEND_URL') ? FRONTEND_URL : 'http://localhost:5173';
 
 header('Access-Control-Allow-Origin: ' . $allowed);
