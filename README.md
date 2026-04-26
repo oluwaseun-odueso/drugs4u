@@ -14,18 +14,26 @@ A full-stack web application for managing pharmacy prescriptions, customer recor
 
 ```
 pharma4/
-├── backend/          PHP REST API
-│   ├── api/          Endpoint handlers
-│   ├── config/       Database & CORS config
-│   ├── middleware/   Auth middleware
-│   ├── helpers/      Response helpers
-│   └── schema.sql    Database schema + seed data
-└── frontend/         React application
-    └── src/
-        ├── pages/    Route-level page components
-        ├── components/ Shared UI components
-        ├── contexts/ React context (auth)
-        └── lib/      API client
+├── backend/                PHP REST API
+│   ├── api/                Endpoint handlers
+│   ├── config/             Database & CORS config
+│   ├── middleware/         Auth middleware
+│   ├── helpers/            Response helpers
+│   ├── tests/              PHPUnit test suite
+│   │   ├── Unit/           Unit tests (helpers, middleware)
+│   │   └── Integration/    Integration tests (auth, customers, prescriptions, roles)
+│   ├── phpunit.xml.example PHPUnit config template
+│   └── schema.sql          Database schema + seed data
+├── frontend/               React application
+│   └── src/
+│       ├── pages/          Route-level page components
+│       ├── components/     Shared UI components
+│       ├── contexts/       React context (auth)
+│       ├── lib/            API client
+│       └── tests/          Vitest unit tests
+├── e2e/                    Playwright end-to-end tests
+├── docs/                   Test plan (MD + DOCX)
+└── playwright.config.js    Playwright configuration
 ```
 
 ## Features
@@ -48,8 +56,9 @@ pharma4/
 SOURCE backend/schema.sql;
 ```
 
-Default admin credentials: **admin / admin123**
-> Change the password after first login.
+Default credentials:
+- Admin: **admin / Admin@2026Rx**
+- Pharmacist: **pharmacist / Pharm@2026Rx**
 
 ### 2. Backend
 
@@ -96,6 +105,55 @@ The Vite dev server proxies all `/api/*` requests to `http://localhost` (configu
 | PUT    | /api/alerts?id=N        | Acknowledge alert              |
 | GET    | /api/reports?type=...   | Reports (by_date/customer/stock)|
 | GET    | /api/dashboard          | Dashboard stats                |
+
+## Testing
+
+### Backend (PHPUnit — unit + integration)
+
+```bash
+cp backend/phpunit.xml.example backend/phpunit.xml
+# Edit backend/phpunit.xml with your local MySQL credentials
+cd backend
+vendor/bin/phpunit --testdox
+```
+
+The bootstrap script automatically creates and seeds a `pharma4_test` database.
+
+### Frontend (Vitest — unit)
+
+```bash
+cd frontend
+npm test
+```
+
+### End-to-End (Playwright)
+
+Start both servers first, then run:
+
+```bash
+# Terminal 1 — backend
+cd backend && php -S localhost:8080 router.php
+
+# Terminal 2 — frontend
+cd frontend && npm run dev
+
+# Terminal 3 — run E2E tests
+npx playwright test
+
+# View HTML report
+npx playwright show-report e2e/report
+```
+
+See `docs/TEST_PLAN.md` for the full test plan and requirements traceability matrix.
+
+## Deployment
+
+The application is deployed on [Render](https://render.com):
+- Frontend (Static Site): React build served via Render CDN
+- Backend (Docker): PHP 8.1 + Apache running in a container
+- Database: MySQL hosted on [Railway](https://railway.app)
+
+The `render.yaml` blueprint at the repo root defines both services.
 
 ## Security
 
