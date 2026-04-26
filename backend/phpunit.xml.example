@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="DB_HOST"     value="localhost"/>
+        <env name="DB_PORT"     value="3306"/>
+        <env name="DB_NAME"     value="pharma4_test"/>
+        <env name="DB_USER"     value="root"/>
+        <env name="DB_PASS"     value="your_db_password_here"/>
+        <env name="APP_ENV"     value="testing"/>
+        <env name="FRONTEND_URL" value="http://localhost:5173"/>
+    </php>
+</phpunit>

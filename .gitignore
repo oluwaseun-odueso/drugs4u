@@ -6,6 +6,20 @@ backend/.env
 frontend/dist/
 frontend/node_modules/
 
+# Backend Composer dependencies
+backend/vendor/
+
+# phpunit.xml contains local DB credentials — copy from phpunit.xml.example
+backend/phpunit.xml
+
+# Root-level Playwright package (installed tool)
+node_modules/
+package-lock.json
+
+# Playwright generated artifacts
+e2e/report/
+e2e/test-results/
+
 # OS files
 .DS_Store
 Thumbs.db
